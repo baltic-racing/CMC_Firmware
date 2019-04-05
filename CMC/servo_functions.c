@@ -172,6 +172,9 @@ void clutch_control(uint8_t clutch, uint8_t clutch_speed){
 
 ISR(TIMER1_COMPA_vect){
 	
+	//disable interrupts
+	cli();
+	
 	switch (servo_active)
 	{	
 		//shiftservo case
@@ -204,6 +207,6 @@ ISR(TIMER1_COMPA_vect){
 		break;
 
 	}
-	//start another ADC conversation to prevent a flickering servo signal;
-	ADCSRA |= (1<<ADSC);
+	//re enable interrupts
+	sei();
 }
