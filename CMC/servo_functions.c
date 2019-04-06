@@ -7,8 +7,7 @@
 
 #include "servo_functions.h"
 
-#define TRUE 1
-#define FALSE 0
+
 
 volatile uint8_t servo_active = 0;
 
@@ -31,9 +30,9 @@ volatile uint16_t time_mid = 0;
 volatile uint8_t gear_desired = 0;
 volatile uint8_t deg_set = FALSE;
 
-extern uint8_t sys_time;
-unsigned long time_shift_started = 0;
-uint16_t shift_duration_current = 0;
+volatile extern unsigned long sys_time;
+volatile unsigned long time_shift_started = 0;
+volatile uint16_t shift_duration_current = 0;
 
 
 //vars needed for the clutch_control

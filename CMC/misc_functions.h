@@ -13,9 +13,7 @@
 
 
 void port_config();
-void timer_config();
-uint8_t gear_read(uint8_t digital_pin, uint8_t adc_value);
-
+void sys_timer_config();
 
 
 #endif /* MISC_FUNCTIONS_H_ */

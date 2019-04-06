@@ -12,6 +12,9 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#define TRUE 1
+#define FALSE 0
+
 #define SERVO_MAXANGLE 130
 #define GEAR_SERVO_MIDDLE_ANGLE 65
 #define GEAR_SERVO_SHIFT_UP_ANGLE 60
@@ -21,7 +24,7 @@
 #define SHIFT_DEG_OFFSET 0
 //this locktime is to prevent another shifting action before this set time in ms expires
 #define LOCKTIME_SHIFT 500
-
+//time in ms before the flatshift is activated
 #define FLATSHIT_OFFSET 60
 
 #define SHIFT_DURATION_UP 100
@@ -32,12 +35,12 @@
 
 
 #define FLATSHIFT_PORT PORTA
-#define FLATSHIFT_PIN PA1
+#define FLATSHIFT_PIN PA0
 
-#define SERVO_SHIFT_PORT PORTC
-#define SERVO_SHIFT_PIN PC1
-#define SERVO_CLUTCH_PORT PORTC
-#define SERVO_CLUTCH_PIN PC0
+#define SERVO_SHIFT_PORT PORTD
+#define SERVO_SHIFT_PIN PD1
+#define SERVO_CLUTCH_PORT PORTD
+#define SERVO_CLUTCH_PIN PD2
 
 
 uint16_t calculate_Servo_ticks(double deg);

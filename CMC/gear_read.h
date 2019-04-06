@@ -11,6 +11,10 @@
 
 #include <avr/io.h>
 
+
+#define TRUE 1
+#define FALSE 0
+
 #define GEAR_1_VOLTAGE 2.24
 #define GEAR_2_VOLTAGE 2.99
 #define GEAR_3_VOLTAGE 3.56
@@ -19,8 +23,8 @@
 #define ADC_GEAR_TOLERANCE 50
 
 
-#define DIGITAL_IN_PORT_INPUT PINC
-#define DIGITAL_IN_PIN PC0
+#define DIGITAL_IN_PORT_INPUT PINA
+#define DIGITAL_IN_PIN PA3
 
 #define ADC_MAX_VALUE 1024
 #define ADC_VOLTAGE_REF 5

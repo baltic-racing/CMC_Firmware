@@ -137,6 +137,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="adc_functions.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="adc_functions.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="canlib.c">
       <SubType>compile</SubType>
     </Compile>
