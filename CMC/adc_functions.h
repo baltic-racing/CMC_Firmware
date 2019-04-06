@@ -2,7 +2,7 @@
  * adc_functions.h
  *
  * Created: 06.04.2019 10:58:21
- *  Author: cerbe
+ *  Author: Ole Hannemann
  */ 
 
 

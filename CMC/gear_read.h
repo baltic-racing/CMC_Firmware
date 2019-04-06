@@ -2,7 +2,7 @@
  * gear_read.h
  *
  * Created: 05.04.2019 19:34:53
- *  Author: cerbe
+ *  Author: Ole Hannemann
  */ 
 
 

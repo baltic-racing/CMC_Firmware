@@ -36,12 +36,12 @@ volatile uint16_t shift_duration_current = 0;
 
 
 //vars needed for the clutch_control
-uint8_t clutch_pressed = 0;
-uint16_t clutch_period = 0;
-uint8_t clutch_angle = 0;
-uint8_t clutch_locktime_set = FALSE;
+volatile uint8_t clutch_pressed = 0;
+volatile uint16_t clutch_period = 0;
+volatile uint8_t clutch_angle = 0;
+volatile uint8_t clutch_locktime_set = FALSE;
 //var where the ticks for the clutch is stored
-uint16_t clutch_time = 0;
+volatile uint16_t clutch_time = 0;
 
 void servo_timer_config(){
 	
