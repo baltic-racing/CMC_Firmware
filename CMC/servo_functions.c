@@ -43,6 +43,16 @@ uint8_t clutch_locktime_set = FALSE;
 //var where the ticks for the clutch is stored
 uint16_t clutch_time = 0;
 
+void servo_timer_config(){
+	
+	//CONFIG FOR THE SERVO CONTROL
+	//USING TIMER 1 COMPARE A INTERRUPT
+	//16 bit Timer 1 config
+	//CTC mode and a prescaler of 8
+	TCCR1B |= (1<<CS11) | (1<<WGM12);
+	TIMSK1 |= (1<<OCIE1A);
+	
+}
 void calculate_general_ticks(void){
 	
 	time_up = calculate_Servo_ticks(GEAR_SERVO_SHIFT_UP_ANGLE+GEAR_SERVO_MIDDLE_ANGLE);
@@ -120,14 +130,11 @@ void shift_control(uint8_t shift_up, uint8_t shift_down, uint8_t gear, uint16_t 
 
 	}
 }
-	
-
 uint16_t calculate_Servo_ticks(double deg){
 	
 	return (uint16_t) (1800 + (deg * (2400 / SERVO_MAXANGLE)) + SHIFT_DEG_OFFSET);
 	
 }
-
 void servo_lock()
 {
 	//locktime calculations
@@ -144,7 +151,6 @@ void servo_lock()
 		shiftlock = FALSE;
 	}
 }
-
 void clutch_control(uint8_t clutch, uint8_t clutch_speed){
 	
 

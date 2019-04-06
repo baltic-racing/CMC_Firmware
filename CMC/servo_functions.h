@@ -47,7 +47,7 @@ uint16_t calculate_Servo_ticks(double deg);
 void calculate_general_ticks(void);
 void shift_control(uint8_t shift_up, uint8_t shift_down, uint8_t gear, uint16_t rpm);
 void clutch_control(uint8_t clutch, uint8_t clutch_speed);
-
+void servo_timer_config();
 
 
 #endif /* SERVO_FUNCTIONS_H_ */

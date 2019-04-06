@@ -29,6 +29,7 @@ int main(void)
 {
     can_cfg();
 	adc_config();
+	servo_timer_config();
 	
 	struct CAN_MOB can_SWC_mob;
 	can_SWC_mob.mob_id = 0x100;
