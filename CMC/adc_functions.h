@@ -13,7 +13,8 @@
 #include <avr/interrupt.h>
 
 
-
+void adc_config();
+uint16_t adc_read();
 
 
 #endif /* ADC_FUNCTIONS_H_ */
