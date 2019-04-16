@@ -39,7 +39,7 @@ int main(void)
 	
 	struct CAN_MOB can_CMC_mob;
 	can_CMC_mob.mob_id = 0x200;
-	can_CMC_mob.mob_idmask = 0; //sending mob so dont care
+	can_CMC_mob.mob_idmask = 0; //sending mob so we dont need an idmask
 	can_CMC_mob.mob_number = 1;
 	uint8_t cmc_databytes[8];
 	
@@ -53,15 +53,15 @@ int main(void)
 		if(sys_time - time_old >= 10){
 			time_old = sys_time;
 			
-			gear = gear_read(adc_value);
-			
+			gear = gear_read(adc_read());
+			//send some additional data to make out if the gear gets transmitted correctly
 			cmc_databytes[0] = gear;
-			cmc_databytes[1] = 13;
-			cmc_databytes[2] = 37;
-			cmc_databytes[3] = 
-	
+			cmc_databytes[1] = gear+1;
+			cmc_databytes[2] = gear;
+			can_tx(&can_CMC_mob, cmc_databytes);
 			can_rx(&can_SWC_mob, swc_databytes);
 			
+			calculate_locktimes();
 			shift_control(SHIFT_UP,SHIFT_DOWN,gear,rpm);
 			clutch_control(BUTTON_LEFT,RIGHT_ENCODER);
 		}

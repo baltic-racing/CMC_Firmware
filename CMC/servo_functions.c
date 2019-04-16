@@ -7,14 +7,13 @@
 
 #include "servo_functions.h"
 
-
-
 volatile uint8_t servo_active = 0;
 
+//time until the servos get deactivated
 volatile uint8_t servo_locktime_gear = 0;
 volatile uint8_t servo_locktime_clutch = 0;
 volatile uint8_t shiftlock = FALSE;
-volatile uint8_t locktime_shift = 0;
+//locktime for a new shifttime
 volatile uint8_t shift = 0;
 volatile uint8_t shift_loktime_set = FALSE;
 volatile uint16_t shift_locktime = 0;
@@ -38,10 +37,14 @@ volatile uint16_t shift_duration_current = 0;
 //vars needed for the clutch_control
 volatile uint8_t clutch_pressed = 0;
 volatile uint16_t clutch_period = 0;
-volatile uint8_t clutch_angle = 0;
+volatile double clutch_angle = 0;
 volatile uint8_t clutch_locktime_set = FALSE;
 //var where the ticks for the clutch is stored
-volatile uint16_t clutch_time = 0;
+//defaults to minimal position
+volatile uint16_t clutch_time = 1800;
+
+
+volatile uint8_t calculated_ticks = FALSE;
 
 void servo_timer_config(){
 	
@@ -52,6 +55,11 @@ void servo_timer_config(){
 	TCCR1B |= (1<<CS11) | (1<<WGM12);
 	TIMSK1 |= (1<<OCIE1A);
 	
+	if (calculated_ticks == FALSE){
+		calculate_general_ticks();		
+	}
+	
+	
 }
 void calculate_general_ticks(void){
 	
@@ -59,13 +67,13 @@ void calculate_general_ticks(void){
 	time_down = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE - GEAR_SERVO_SHIFT_DOWN_ANGLE);
 	time_neutral = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE - GEAR_SERVO_SHIFT_NEUTRAL_ANGLE);
 	time_mid = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE);
+	calculated_ticks = TRUE;
 		
 }
 void shift_control(uint8_t shift_up, uint8_t shift_down, uint8_t gear, uint16_t rpm){
 	
 	//if shifting process wasn't started and a shifting signal is received
 	if(!shiftlock && (shift_up == 1 || shift_down == 1)){
-		
 		
 		//set start timestamp
 		time_shift_started=sys_time;
@@ -81,7 +89,7 @@ void shift_control(uint8_t shift_up, uint8_t shift_down, uint8_t gear, uint16_t 
 		}
 		//if shift down signal is received
 		if(shift_down && gear > 0 ){
-			shift_locktime = locktime_shift;
+			shift_locktime = LOCKTIME_SHIFT;
 			shiftlock = TRUE;
 			shift = 0;
 			servo_locktime_gear = SHIFT_DURATION_DOWN+SHIFT_DURATION_MID;
@@ -95,7 +103,7 @@ void shift_control(uint8_t shift_up, uint8_t shift_down, uint8_t gear, uint16_t 
 				
 			}
 		}
-		} else {
+	} else {
 		//when the servo should move to desired position
 		if((sys_time-time_shift_started) < shift_duration_current && gear_desired != gear){
 			
@@ -174,7 +182,21 @@ void clutch_control(uint8_t clutch, uint8_t clutch_speed){
 		}
 	}
 }
+void calculate_locktimes(){
+	
+	//locktime calculations
+	if (servo_locktime_gear > 0){
+		servo_locktime_gear-=10;
+	}
+	if (servo_locktime_clutch > 0)
+	servo_locktime_clutch-=10;
+	if(shift_locktime > 0){
 
+		shift_locktime -= 10;
+		}else{
+		shiftlock = FALSE;
+	}	
+}
 ISR(TIMER1_COMPA_vect){
 	
 	//disable interrupts
@@ -184,32 +206,32 @@ ISR(TIMER1_COMPA_vect){
 	{	
 		//shiftservo case
 		case 0:
-		//toggle old servo
-		SERVO_CLUTCH_PORT &= ~(1<<SERVO_CLUTCH_PIN);
-		//if locktime elapsed pull up the signal pin
-		//if the servo is shifting
-		if (shiftlock){
-			SERVO_SHIFT_PORT |= (1<<SERVO_SHIFT_PIN);
-		}
-		//set the interrupt compare value to the desired time
-		OCR1A = shift_time;
-		//change var to get to the next case
-		servo_active = 1;
-		break;
+			//toggle old servo
+			SERVO_CLUTCH_PORT &= ~(1<<SERVO_CLUTCH_PIN);
+			//if locktime elapsed pull up the signal pin
+			//if the servo is shifting
+			if (shiftlock){
+				SERVO_SHIFT_PORT |= (1<<SERVO_SHIFT_PIN);
+			}
+			//set the interrupt compare value to the desired time
+			OCR1A = shift_time;
+			//change var to get to the next case
+			servo_active = 1;
+			break;
 		
 		//clutchservo
 		case 1:
-		//toggle old servo
-		SERVO_SHIFT_PORT &= ~(1<<SERVO_SHIFT_PIN);
-		//if locktime elapsed pull up the signal pin
-		if (servo_locktime_clutch!=0){
-			SERVO_CLUTCH_PORT |= (1<<SERVO_CLUTCH_PIN);
-		}
-		//set the interrupt compare value to the desired time
-		OCR1A = clutch_time;
-		//change var to get to the next case
-		servo_active = 0;
-		break;
+			//toggle old servo
+			SERVO_SHIFT_PORT &= ~(1<<SERVO_SHIFT_PIN);
+			//if locktime elapsed pull up the signal pin
+			if (servo_locktime_clutch!=0){
+				SERVO_CLUTCH_PORT |= (1<<SERVO_CLUTCH_PIN);
+			}
+			//set the interrupt compare value to the desired time
+			OCR1A = clutch_time;
+			//change var to get to the next case
+			servo_active = 0;
+			break;
 
 	}
 	//re enable interrupts

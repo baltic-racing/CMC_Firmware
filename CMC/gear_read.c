@@ -8,7 +8,7 @@
 #include "gear_read.h"
 
 uint8_t gear = 10;
-volatile uint8_t calculated_adc_values = 0;
+volatile uint8_t calculated_adc_values = FALSE;
 volatile uint16_t adc_gear_values[5];
 
 
@@ -19,7 +19,6 @@ void calculate_adc_values(){
 	adc_gear_values[2] = GEAR_3_VOLTAGE*(ADC_MAX_VALUE/ADC_VOLTAGE_REF);
 	adc_gear_values[3] = GEAR_4_VOLTAGE*(ADC_MAX_VALUE/ADC_VOLTAGE_REF);
 	adc_gear_values[4] = GEAR_5_VOLTAGE*(ADC_MAX_VALUE/ADC_VOLTAGE_REF);
-	
 	calculated_adc_values = TRUE;
 	
 }
@@ -47,22 +46,23 @@ uint8_t gear_read(uint16_t adc_value){
 		while(gear == 10 && x < 5){
 			if (x < 5 && x > 0 ) {
 				//if gear is not 1 or 6 use this routine
-				if (adc_value >= (adc_gear_values[x-1] - ADC_GEAR_TOLERANCE) && (adc_gear_values[x] - ADC_GEAR_TOLERANCE) )
-				gear = x+1;
-				} else {
+				if (adc_value >= (adc_gear_values[x-1] - ADC_GEAR_TOLERANCE) && (adc_gear_values[x] - ADC_GEAR_TOLERANCE)){
+					gear = x+1;
+				}
+			//special cases for first and last gear
+			} else {
 				
-					if(adc_value >= adc_gear_values[4] - ADC_GEAR_TOLERANCE)
-					gear = 5;
+					if(adc_value >= adc_gear_values[4] - ADC_GEAR_TOLERANCE){
+						gear = 5;
+					}
 				
-					if(adc_value <= adc_gear_values[0] + ADC_GEAR_TOLERANCE)
-					gear = 1;
+					if(adc_value <= adc_gear_values[0] + ADC_GEAR_TOLERANCE){
+						gear = 1;
+					}
 			}
 
 			++x;
 		}
 	}
-	
-	
-	
 	return gear;
 }
