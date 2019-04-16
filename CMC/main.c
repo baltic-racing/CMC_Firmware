@@ -36,6 +36,13 @@ int main(void)
 	can_SWC_mob.mob_idmask = 0xfff;
 	can_SWC_mob.mob_number = 0;
 	uint8_t swc_databytes[8];
+	
+	struct CAN_MOB can_CMC_mob;
+	can_CMC_mob.mob_id = 0x200;
+	can_CMC_mob.mob_idmask = 0; //sending mob so dont care
+	can_CMC_mob.mob_number = 1;
+	uint8_t cmc_databytes[8];
+	
 	uint16_t adc_value;
 	uint8_t gear = 10;
 	
@@ -46,9 +53,13 @@ int main(void)
 		if(sys_time - time_old >= 10){
 			time_old = sys_time;
 			
-			adc_value = adc_read();
 			gear = gear_read(adc_value);
 			
+			cmc_databytes[0] = gear;
+			cmc_databytes[1] = 13;
+			cmc_databytes[2] = 37;
+			cmc_databytes[3] = 
+	
 			can_rx(&can_SWC_mob, swc_databytes);
 			
 			shift_control(SHIFT_UP,SHIFT_DOWN,gear,rpm);
