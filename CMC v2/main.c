@@ -8,12 +8,12 @@
  //DEFINES
  #define tx_mobs 1
  #define rx_mobs 6 
- #define SLOW can_data_bytes[1][0]
- #define FAST can_data_bytes[1][1]
- #define DWN can_data_bytes[1][2]
- #define UP can_data_bytes[1][3]
- #define L_ENC can_data_bytes[1][4]
- #define R_ENC can_data_bytes[1][5]
+ #define SLOW can_data_bytes[1][5]
+ #define FAST can_data_bytes[1][4]
+ #define DWN can_data_bytes[1][3]
+ #define UP can_data_bytes[1][2]
+ #define L_ENC can_data_bytes[1][0]
+ #define R_ENC can_data_bytes[1][1]
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -51,13 +51,12 @@ uint8_t gear = 0;
 uint8_t gear_desired = 0;
 
 //voltage areas for the gear sensor
-double gear_voltages[6] = { 1.35,
-							2.24,
+double gear_voltages[6] = { 2.24,
 							2.99,
 							3.56,
 							4.07,
 							4.57,
-							};
+							5};
 
 uint8_t gear_adc_voltages[6]; //definitions needs to be run first
 uint8_t gear_adc_limits[6];
@@ -182,17 +181,17 @@ uint8_t deg_set = 0;
 
 void shift_ctrl(){
 	
-	//if shifting process wasnt started and a shifting signal is received
+	//if shifting process wasn't started and a shifting signal is received
 	if(!shiftlock && (UP || DWN)){
 		
 		
 		//set start timestamp
 		tme_shf_str=time;
 		//if shift up signal comes
-		if( UP && gear < 6 ){
+		if( UP && gear < 5 ){
 			shift_locktime = locktime_shift;
 			shiftlock = true;
-			shift = 2;
+			shift = 0;
 			servo_locktime_gear = shf_drt_up+shf_drt_mid;
 			gear_desired = gear+1;
 			shf_drt_current = shf_drt_up;
@@ -203,7 +202,7 @@ void shift_ctrl(){
 		if( DWN && gear > 0 ){
 			shift_locktime = locktime_shift;
 			shiftlock = true;
-			shift = 0;
+			shift = 2;
 			servo_locktime_gear = shf_drt_dwn+shf_drt_mid;
 			shf_drt_current = shf_drt_dwn;
 			gear_desired = gear-1;
@@ -275,7 +274,7 @@ void clutch_ctrl(){
 			clu_pressed = 0;
 		}
 		if(clu_period > 0){
-			deg_clu = (100/(encoder*8)*clu_period)/100;
+			deg_clu = (100./(encoder*8)*clu_period)/100;
 			clutch_time = 1800+ (deg_clu *(2400/deg_max));
 			clu_period -= 10;
 		}
@@ -323,7 +322,7 @@ void port_config()
 	 
 	 MCUCR &= ~(1<<PUD); //Pull Up Enable
 	 DDRA = (1<<PA0) | (1<<PA1) | (1<<PA2);
-	 DDRB = (1<<PB0) | (1<<PB1) | (1<<PB2);
+	 DDRB = (1<<PB0) | (1<<PB1) | (1<<PB2) | (1<<PB4) | (1<<PB5);
 	 
  }
 void servo_lock()
@@ -481,11 +480,11 @@ ISR(TIMER1_COMPA_vect)//ISR for Servosignal generation
 		//Gearservo
 		case 0:	
 			//toggle old servo		
-			PORTA &= ~(1<<PA1);
+			PORTB &= ~(1<<PB5);
 			//if locktime elapsed pull up the signal pin
 			//if the servo is shifting
 			if (shiftlock)
-			PORTA |= (1<<PA2);
+			PORTB |= (1<<PB4);
 			//set the interrupt compare value to the desired time
 			OCR1A = shift_time;
 			//change var to get to the next case
@@ -495,10 +494,10 @@ ISR(TIMER1_COMPA_vect)//ISR for Servosignal generation
 		//clutchservo
 		case 1:
 			//toggle old servo
-			PORTA &= ~(1<<PA2);
+			PORTB &= ~(1<<PB4);
 			//if locktime elapsed pull up the signal pin
 			if (servo_locktime_clutch!=0)
-			PORTA |= (1<<PA1);
+			PORTB |= (1<<PB5);
 			//set the interrupt compare value to the desired time
 			OCR1A = clutch_time;
 			//change var to get to the next case
