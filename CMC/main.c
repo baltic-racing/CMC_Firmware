@@ -9,8 +9,8 @@
 #define SHIFT_DOWN swc_databytes[2]
 #define BUTTON_LEFT swc_databytes[4]
 #define BUTTON_RIGHT swc_databytes[5]
-#define LEFT_ENOCDER swc_databytes[0]
-#define RIGHT_ENCODER swc_databytes[1]
+#define LEFT_ENCODER swc_databytes[1]
+#define RIGHT_ENCODER swc_databytes[0]
 
 
 #include <avr/io.h>
@@ -30,6 +30,8 @@ int main(void)
     can_cfg();
 	adc_config();
 	servo_timer_config();
+	sys_timer_config();
+	port_config();
 	
 	struct CAN_MOB can_SWC_mob;
 	can_SWC_mob.mob_id = 0x100;
@@ -43,13 +45,13 @@ int main(void)
 	can_CMC_mob.mob_number = 1;
 	uint8_t cmc_databytes[8];
 	
-	uint8_t gear = 10;
+	volatile uint8_t gear = 10;
 	
 	sei();
 	
     while (1) {
 		
-		if(sys_time - time_old >= 10){
+		if((sys_time - time_old) >= 10){
 			time_old = sys_time;
 			
 			gear = gear_read(adc_read());
@@ -62,7 +64,7 @@ int main(void)
 			
 			calculate_locktimes();
 			shift_control(SHIFT_UP,SHIFT_DOWN,gear,rpm);
-			clutch_control(BUTTON_LEFT||BUTTON_RIGHT,RIGHT_ENCODER);
+			clutch_control(BUTTON_LEFT||BUTTON_RIGHT,LEFT_ENCODER+1);
 		}
 		
 	}

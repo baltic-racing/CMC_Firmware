@@ -77,10 +77,10 @@ void shift_control(uint8_t shift_up, uint8_t shift_down, uint8_t gear, uint16_t 
 		//set start timestamp
 		time_shift_started=sys_time;
 		//if shift up signal comes
-		if( shift_up && gear < 6 ){
+		if( shift_up && gear < 5 ){
 			shift_locktime = LOCKTIME_SHIFT;
 			shiftlock = TRUE;
-			shift = 2;
+			shift = 0;
 			servo_locktime_gear = SHIFT_DURATION_UP + SHIFT_DURATION_MID;
 			gear_desired = gear+1;
 			shift_duration_current = SHIFT_DURATION_UP;
@@ -90,7 +90,7 @@ void shift_control(uint8_t shift_up, uint8_t shift_down, uint8_t gear, uint16_t 
 		if(shift_down && gear > 0 ){
 			shift_locktime = LOCKTIME_SHIFT;
 			shiftlock = TRUE;
-			shift = 0;
+			shift = 2;
 			servo_locktime_gear = SHIFT_DURATION_DOWN+SHIFT_DURATION_MID;
 			shift_duration_current = SHIFT_DURATION_DOWN;
 			gear_desired = gear-1;
@@ -139,7 +139,7 @@ void shift_control(uint8_t shift_up, uint8_t shift_down, uint8_t gear, uint16_t 
 }
 uint16_t calculate_Servo_ticks(double deg){
 	
-	return (uint16_t) (1800 + (deg * (2400 / SERVO_MAXANGLE)) + SHIFT_DEG_OFFSET);
+	return (uint16_t) (1800 + (deg * (2400.0 / SERVO_MAXANGLE)));
 	
 }
 void servo_lock()
@@ -154,7 +154,7 @@ void servo_lock()
 	if(shift_locktime == TRUE){
 
 		shift_locktime -= 1;
-		}else{
+	}else{
 		shiftlock = FALSE;
 	}
 }
@@ -162,9 +162,9 @@ void clutch_control(uint8_t clutch, uint8_t clutch_speed){
 	
 
 	if(clutch == TRUE){
-		clutch_angle = 100;
-		calculate_Servo_ticks(clutch_angle);
-		clutch_period = 800*(clutch_speed);
+		clutch_angle = 110.0;
+		clutch_time = calculate_Servo_ticks(clutch_angle);
+		clutch_period = 500*(clutch_speed);
 		clutch_pressed = 1;
 		servo_locktime_clutch=clutch_period;
 		
@@ -175,7 +175,7 @@ void clutch_control(uint8_t clutch, uint8_t clutch_speed){
 			clutch_pressed = FALSE;
 		}
 		if(clutch_period > 0){
-			clutch_angle = (100/(clutch_speed*8)*clutch_period)/100;
+			clutch_angle = (110.0/(clutch_speed*5.0)*clutch_period)/100;
 			clutch_time = calculate_Servo_ticks(clutch_angle);
 			clutch_period -= 10;
 		}

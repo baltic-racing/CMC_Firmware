@@ -14,19 +14,19 @@
 
 #define TRUE 1
 #define FALSE 0
-
-#define GEAR_1_VOLTAGE 2.24
-#define GEAR_2_VOLTAGE 2.99
-#define GEAR_3_VOLTAGE 3.56
-#define GEAR_4_VOLTAGE 4.07
-#define GEAR_5_VOLTAGE 4.57
-#define ADC_GEAR_TOLERANCE 50
+//2.24
+#define GEAR_1_VOLTAGE 2.99 
+#define GEAR_2_VOLTAGE 3.5
+#define GEAR_3_VOLTAGE 4.04
+#define GEAR_4_VOLTAGE 4.41
+#define GEAR_5_VOLTAGE 4.75
+#define ADC_GEAR_TOLERANCE 30
 
 
 #define DIGITAL_IN_PORT_INPUT PINA
 #define DIGITAL_IN_PIN PA3
 
-#define ADC_MAX_VALUE 1024
+#define ADC_MAX_VALUE 1023
 #define ADC_VOLTAGE_REF 5
 
 void calculate_adc_values();

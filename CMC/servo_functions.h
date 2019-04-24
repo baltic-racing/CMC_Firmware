@@ -37,10 +37,10 @@
 #define FLATSHIFT_PORT PORTA
 #define FLATSHIFT_PIN PA0
 
-#define SERVO_SHIFT_PORT PORTD
-#define SERVO_SHIFT_PIN PD1
-#define SERVO_CLUTCH_PORT PORTD
-#define SERVO_CLUTCH_PIN PD2
+#define SERVO_SHIFT_PORT PORTB
+#define SERVO_SHIFT_PIN PB4
+#define SERVO_CLUTCH_PORT PORTB
+#define SERVO_CLUTCH_PIN PB5
 
 
 //NEEDS a unsigned long called Sys_time
@@ -52,6 +52,8 @@ void clutch_control(uint8_t clutch, uint8_t clutch_speed);
 void servo_timer_config();
 //this functions excepts to be called every 10ms
 void calculate_locktimes();
+
+ISR(TIMER1_COMPA_vect);
 
 
 #endif /* SERVO_FUNCTIONS_H_ */

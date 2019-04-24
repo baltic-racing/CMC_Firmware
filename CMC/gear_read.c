@@ -46,7 +46,7 @@ uint8_t gear_read(uint16_t adc_value){
 		while(gear == 10 && x < 5){
 			if (x < 5 && x > 0 ) {
 				//if gear is not 1 or 6 use this routine
-				if (adc_value >= (adc_gear_values[x-1] - ADC_GEAR_TOLERANCE) && (adc_gear_values[x] - ADC_GEAR_TOLERANCE)){
+				if (adc_value >= (adc_gear_values[x-1] - ADC_GEAR_TOLERANCE) && adc_value <= (adc_gear_values[x] + ADC_GEAR_TOLERANCE)){
 					gear = x+1;
 				}
 			//special cases for first and last gear

@@ -10,9 +10,11 @@
 #define MISC_FUNCTIONS_H_
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 
 void port_config();
 void sys_timer_config();
+ISR(TIMER0_COMP_vect);
 
 #endif /* MISC_FUNCTIONS_H_ */
