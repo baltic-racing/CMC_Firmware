@@ -21,7 +21,7 @@
 #include "gear_read.h"
 #include <avr/interrupt.h>
 
-volatile unsigned long sys_time = 0;
+extern unsigned long sys_time;
 volatile unsigned long time_old = 0;
 volatile uint16_t rpm = 0;
 
@@ -43,7 +43,6 @@ int main(void)
 	can_CMC_mob.mob_number = 1;
 	uint8_t cmc_databytes[8];
 	
-	uint16_t adc_value;
 	uint8_t gear = 10;
 	
 	sei();
@@ -63,7 +62,7 @@ int main(void)
 			
 			calculate_locktimes();
 			shift_control(SHIFT_UP,SHIFT_DOWN,gear,rpm);
-			clutch_control(BUTTON_LEFT,RIGHT_ENCODER);
+			clutch_control(BUTTON_LEFT||BUTTON_RIGHT,RIGHT_ENCODER);
 		}
 		
 	}

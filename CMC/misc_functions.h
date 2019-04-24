@@ -15,5 +15,4 @@
 void port_config();
 void sys_timer_config();
 
-
 #endif /* MISC_FUNCTIONS_H_ */

@@ -29,7 +29,7 @@ volatile uint16_t time_mid = 0;
 volatile uint8_t gear_desired = 0;
 volatile uint8_t deg_set = FALSE;
 
-volatile extern unsigned long sys_time;
+extern unsigned long sys_time;
 volatile unsigned long time_shift_started = 0;
 volatile uint16_t shift_duration_current = 0;
 
@@ -42,7 +42,6 @@ volatile uint8_t clutch_locktime_set = FALSE;
 //var where the ticks for the clutch is stored
 //defaults to minimal position
 volatile uint16_t clutch_time = 1800;
-
 
 volatile uint8_t calculated_ticks = FALSE;
 
