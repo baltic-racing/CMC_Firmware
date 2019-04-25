@@ -14,6 +14,11 @@ void port_config(){
 	DDRF = 0;						//mark analog inputs as input
 	DDRD |= (1<<PD0);				//mark the output of the sys status led as output
 }
+void sys_tick(){
+
+	PORTD ^= 1<<PD0;
+
+}
 
 void sys_timer_config(){
 	

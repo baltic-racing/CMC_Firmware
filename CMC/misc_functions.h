@@ -16,5 +16,6 @@
 void port_config();
 void sys_timer_config();
 ISR(TIMER0_COMP_vect);
+void sys_tick();
 
 #endif /* MISC_FUNCTIONS_H_ */

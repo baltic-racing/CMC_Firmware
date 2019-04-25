@@ -37,10 +37,11 @@ volatile uint16_t shift_duration_current = 0;
 //vars needed for the clutch_control
 volatile uint8_t clutch_pressed = 0;
 volatile uint16_t clutch_period = 0;
-volatile double clutch_angle = 0;
+volatile long double clutch_angle = 0;
 volatile uint8_t clutch_locktime_set = FALSE;
 //var where the ticks for the clutch is stored
 //defaults to minimal position
+volatile long double pitch = 0;
 volatile uint16_t clutch_time = 1800;
 
 volatile uint8_t calculated_ticks = FALSE;
@@ -162,11 +163,12 @@ void clutch_control(uint8_t clutch, uint8_t clutch_speed){
 	
 
 	if(clutch == TRUE){
-		clutch_angle = 110.0;
+		clutch_angle = 120.0;
 		clutch_time = calculate_Servo_ticks(clutch_angle);
 		clutch_period = 500*(clutch_speed);
 		clutch_pressed = 1;
 		servo_locktime_clutch=clutch_period;
+		pitch = (long double) 120/clutch_period;
 		
 	} else{
 		if (!clutch_locktime_set && clutch_pressed){
@@ -175,8 +177,8 @@ void clutch_control(uint8_t clutch, uint8_t clutch_speed){
 			clutch_pressed = FALSE;
 		}
 		if(clutch_period > 0){
-			clutch_angle = (110.0/(clutch_speed*5.0)*clutch_period)/100;
-			clutch_time = calculate_Servo_ticks(clutch_angle);
+			clutch_angle = clutch_angle-0.0000001;
+			clutch_time = clutch_time - calculate_Servo_ticks(clutch_angle);
 			clutch_period -= 10;
 		}
 	}

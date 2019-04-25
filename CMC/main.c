@@ -23,6 +23,7 @@
 
 extern unsigned long sys_time;
 volatile unsigned long time_old = 0;
+volatile uint8_t time_old_40 = 0;
 volatile uint16_t rpm = 0;
 
 int main(void)
@@ -53,6 +54,7 @@ int main(void)
 		
 		if((sys_time - time_old) >= 10){
 			time_old = sys_time;
+			time_old_40++;
 			
 			gear = gear_read(adc_read());
 			//send some additional data to make out if the gear gets transmitted correctly
@@ -65,6 +67,11 @@ int main(void)
 			calculate_locktimes();
 			shift_control(SHIFT_UP,SHIFT_DOWN,gear,rpm);
 			clutch_control(BUTTON_LEFT||BUTTON_RIGHT,LEFT_ENCODER+1);
+			
+		}
+		if(time_old_40 >=10){
+			time_old_40 = 0;
+			sys_tick();
 		}
 		
 	}
