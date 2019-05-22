@@ -52,7 +52,7 @@ uint8_t gear_read(uint16_t adc_value){
 			//special cases for first and last gear
 			} else {
 				
-					if(adc_value >= adc_gear_values[4] - ADC_GEAR_TOLERANCE){
+					if(adc_value >= adc_gear_values[4] - ADC_GEAR_TOLERANCE && adc_value <= adc_gear_values[4]+ADC_GEAR_TOLERANCE){
 						gear = 5;
 					}
 				

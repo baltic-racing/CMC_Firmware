@@ -35,13 +35,11 @@ volatile uint16_t shift_duration_current = 0;
 
 
 //vars needed for the clutch_control
-volatile uint8_t clutch_pressed = 0;
 volatile uint16_t clutch_period = 0;
-volatile long double clutch_angle = 0;
-volatile uint8_t clutch_locktime_set = FALSE;
+volatile double clutch_angle = 0;
 //var where the ticks for the clutch is stored
 //defaults to minimal position
-volatile long double pitch = 0;
+volatile double pitch = 0;
 volatile uint16_t clutch_time = 1800;
 
 volatile uint8_t calculated_ticks = FALSE;
@@ -65,8 +63,8 @@ void calculate_general_ticks(void){
 	
 	time_up = calculate_Servo_ticks(GEAR_SERVO_SHIFT_UP_ANGLE+GEAR_SERVO_MIDDLE_ANGLE);
 	time_down = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE - GEAR_SERVO_SHIFT_DOWN_ANGLE);
-	time_neutral = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE - GEAR_SERVO_SHIFT_NEUTRAL_ANGLE);
-	time_mid = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE);
+	time_neutral = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE + GEAR_SERVO_SHIFT_NEUTRAL_ANGLE);
+	time_mid = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE)+SHIFT_DEG_OFFSET;
 	calculated_ticks = TRUE;
 		
 }
@@ -162,27 +160,22 @@ void servo_lock()
 void clutch_control(uint8_t clutch, uint8_t clutch_speed){
 	
 
-	if(clutch == TRUE){
-		clutch_angle = 120.0;
+	if(clutch==TRUE){
+
+		clutch_angle = CLUTCH_MAX_ANGLE;
 		clutch_time = calculate_Servo_ticks(clutch_angle);
 		clutch_period = 500*(clutch_speed);
-		clutch_pressed = 1;
-		servo_locktime_clutch=clutch_period;
-		pitch = (long double) 120/clutch_period;
-		
-	} else{
-		if (!clutch_locktime_set && clutch_pressed){
-			servo_locktime_clutch=clutch_period;
-			clutch_locktime_set=TRUE;
-			clutch_pressed = FALSE;
-		}
+		pitch = (double)(CLUTCH_MAX_ANGLE)/(clutch_period/10.0);
+	
+	}else{
 		if(clutch_period > 0){
-			clutch_angle = clutch_angle-0.0000001;
-			clutch_time = clutch_time - calculate_Servo_ticks(clutch_angle);
+			clutch_angle = clutch_angle-pitch;
+			clutch_time = calculate_Servo_ticks(clutch_angle);
 			clutch_period -= 10;
 		}
 	}
 }
+
 void calculate_locktimes(){
 	
 	//locktime calculations
@@ -225,7 +218,7 @@ ISR(TIMER1_COMPA_vect){
 			//toggle old servo
 			SERVO_SHIFT_PORT &= ~(1<<SERVO_SHIFT_PIN);
 			//if locktime elapsed pull up the signal pin
-			if (servo_locktime_clutch!=0){
+			if (clutch_period > 0){
 				SERVO_CLUTCH_PORT |= (1<<SERVO_CLUTCH_PIN);
 			}
 			//set the interrupt compare value to the desired time
