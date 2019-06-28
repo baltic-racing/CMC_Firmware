@@ -6,6 +6,9 @@
  */ 
 
 #include "servo_functions.h"
+#include "fan_control.h"
+
+volatile uint16_t fan_time = 1800;
 
 volatile uint8_t servo_active = 0;
 
@@ -61,9 +64,9 @@ void servo_timer_config(){
 }
 void calculate_general_ticks(void){
 	
-	time_up = calculate_Servo_ticks(GEAR_SERVO_SHIFT_UP_ANGLE+GEAR_SERVO_MIDDLE_ANGLE);
+	time_up = calculate_Servo_ticks(GEAR_SERVO_SHIFT_UP_ANGLE + GEAR_SERVO_MIDDLE_ANGLE);
 	time_down = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE - GEAR_SERVO_SHIFT_DOWN_ANGLE);
-	time_neutral = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE + GEAR_SERVO_SHIFT_NEUTRAL_ANGLE);
+	time_neutral = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE - GEAR_SERVO_SHIFT_NEUTRAL_ANGLE);
 	time_mid = calculate_Servo_ticks(GEAR_SERVO_MIDDLE_ANGLE)+SHIFT_DEG_OFFSET;
 	calculated_ticks = TRUE;
 		
@@ -81,6 +84,9 @@ void shift_control(uint8_t shift_up, uint8_t shift_down, uint8_t gear, uint16_t 
 			shiftlock = TRUE;
 			shift = 0;
 			servo_locktime_gear = SHIFT_DURATION_UP + SHIFT_DURATION_MID;
+			if(gear == 0){
+				servo_locktime_gear = SHIFT_DURATION_DOWN + SHIFT_DURATION_MID+50;
+			}
 			gear_desired = gear+1;
 			shift_duration_current = SHIFT_DURATION_UP;
 			//if we are in neutral and hsift up we want gear 1
@@ -111,13 +117,13 @@ void shift_control(uint8_t shift_up, uint8_t shift_down, uint8_t gear, uint16_t 
 				//set shift angle according to wished position
 				switch (shift){
 					case 0:
-					shift_time = time_down;
+					shift_time = time_up;
 					break;
 					case 1:
 					shift_time = time_neutral;
 					break;
 					case 2:
-					shift_time = time_up;
+					shift_time = time_down;
 					break;
 				}
 			}
@@ -191,6 +197,23 @@ void calculate_locktimes(){
 		shiftlock = FALSE;
 	}	
 }
+
+void fan_speed_controll(uint8_t temperature, uint16_t engine_running){
+	
+	if(temperature > CLT_MAX){
+		temperature = CLT_MAX;
+	}
+	
+	if(engine_running > 1500 && temperature >= CLT_MIN){
+		fan_time = calculate_Servo_ticks(26+(SERVO_MAXANGLE-FAN_MIN)/(CLT_MAX-CLT_MIN)*(temperature-CLT_MIN));
+		//fan_time = calculate_Servo_ticks(26);
+	} 
+	else {
+			fan_time = 1800;
+	}
+	
+}
+
 ISR(TIMER1_COMPA_vect){
 	
 	//disable interrupts
@@ -201,7 +224,7 @@ ISR(TIMER1_COMPA_vect){
 		//shiftservo case
 		case 0:
 			//toggle old servo
-			SERVO_CLUTCH_PORT &= ~(1<<SERVO_CLUTCH_PIN);
+			FAN2_PORT &= ~(1<<FAN2_PIN);
 			//if locktime elapsed pull up the signal pin
 			//if the servo is shifting
 			if (shiftlock){
@@ -224,9 +247,20 @@ ISR(TIMER1_COMPA_vect){
 			//set the interrupt compare value to the desired time
 			OCR1A = clutch_time;
 			//change var to get to the next case
-			servo_active = 0;
+			servo_active = 2;
 			break;
-
+		case 2:
+			SERVO_CLUTCH_PORT &= ~(1<<SERVO_CLUTCH_PIN);
+			FAN1_PORT |= (1<<FAN1_PIN);
+			OCR1A = fan_time;
+			servo_active = 3;
+		break;
+		case 3:
+			FAN1_PORT &= ~(1<<FAN1_PIN);
+			FAN2_PORT |= (1<<FAN2_PIN);
+			OCR1A = fan_time;
+			servo_active = 0;
+		break;
 	}
 	//re enable interrupts
 	sei();

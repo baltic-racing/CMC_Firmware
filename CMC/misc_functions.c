@@ -8,7 +8,7 @@
 volatile unsigned long sys_time = 0;
 
 void port_config(){
-	DDRB = 0 | (1<<PB4) | (1<<PB5);	//Mark PB4 and PB5 as output for the servo motors
+	DDRB = 0 | (1<<PB4) | (1<<PB5) | (1<<PB0) | (1<<PB1);	//Mark PB4 and PB5 as output for the servo motors
 	DDRC = 0;						//fuse status input is an input
 	DDRA = 0 | (1<<PA0);			//Flatshift Pin is makred as output remaining is defined as input because its unused
 	DDRF = 0;						//mark analog inputs as input

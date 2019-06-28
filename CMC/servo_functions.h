@@ -16,21 +16,21 @@
 #define FALSE 0
 
 #define SERVO_MAXANGLE 130
-#define GEAR_SERVO_MIDDLE_ANGLE 63
-#define GEAR_SERVO_SHIFT_UP_ANGLE 60
-#define GEAR_SERVO_SHIFT_DOWN_ANGLE 60
-#define GEAR_SERVO_SHIFT_NEUTRAL_ANGLE 30
+#define GEAR_SERVO_MIDDLE_ANGLE 65
+#define GEAR_SERVO_SHIFT_UP_ANGLE 55 //60
+#define GEAR_SERVO_SHIFT_DOWN_ANGLE 55 //60
+#define GEAR_SERVO_SHIFT_NEUTRAL_ANGLE 55
 #define CLUTCH_MAX_ANGLE 120
 #define SHIFT_DEG_OFFSET 0
 //this locktime is to prevent another shifting action before this set time in ms expires
 #define LOCKTIME_SHIFT 500
 //time in ms before the flatshift is activated
-#define FLATSHIT_OFFSET 60
+#define FLATSHIT_OFFSET 120
 
-#define SHIFT_DURATION_UP (uint8_t) 250
+#define SHIFT_DURATION_UP (uint8_t) 180
 #define SHIFT_DURATION_DOWN (uint8_t) 250
 #define SHIFT_DURATION_MID (uint8_t) 250
-#define SHIFT_DURATION_NEUTRAL (uint8_t) 100
+#define SHIFT_DURATION_NEUTRAL (uint8_t) 200
 //offset for the exact shift position in ticks
 
 
