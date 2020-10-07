@@ -26,6 +26,7 @@ volatile unsigned long time_old = 0;
 volatile uint8_t time_old_40 = 0;
 volatile uint16_t rpm = 0;
 volatile uint16_t fan_deadtime = 75;
+extern Blipper_Enable_Flag;
 
 int main(void)
 {
@@ -37,7 +38,7 @@ int main(void)
 
 	struct CAN_MOB can_SWC_mob;
 	can_SWC_mob.mob_id = 0x100;
-	can_SWC_mob.mob_idmask = 0xfff;
+	can_SWC_mob.mob_idmask = 0xffff;
 	can_SWC_mob.mob_number = 0;
 	uint8_t swc_databytes[8];
 	
@@ -74,6 +75,7 @@ int main(void)
 			cmc_databytes[0] = gear;
 			cmc_databytes[1] = gear+1;
 			cmc_databytes[2] = gear;
+			cmc_databytes[3] = Blipper_Enable_Flag;
 			can_tx(&can_CMC_mob, cmc_databytes);
 			can_rx(&can_SWC_mob, swc_databytes);
 			can_rx(&can_ecu0_mob, ecu0_databytes);

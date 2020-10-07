@@ -25,7 +25,9 @@
 //this locktime is to prevent another shifting action before this set time in ms expires
 #define LOCKTIME_SHIFT 500
 //time in ms before the flatshift is activated
+
 #define FLATSHIT_OFFSET 120
+#define BLIPPER_OFFSET 120
 
 #define SHIFT_DURATION_UP (uint8_t) 180
 #define SHIFT_DURATION_DOWN (uint8_t) 250
