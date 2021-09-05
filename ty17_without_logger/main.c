@@ -10,6 +10,9 @@
 #include <avr/eeprom.h>
 #include <stdbool.h>
 
+#define SERVO_MAXANGLE 130
+#define CLUTCH_MAX_ANGLE 120
+
 //display vars
 uint8_t dsp_counter = 0;
 uint8_t dsp_byte = 0;
@@ -142,16 +145,21 @@ int16_t shift_locktime = 0;
 int16_t locktime_shift = 400;
 uint8_t shift_time_actual = 0;
 
+volatile double clutch_angle = 0;
+volatile double pitch = 0;
+volatile uint16_t clutch_period = 0;
+
 bool aut_shf = false;
 unsigned long aut_shf_tim=0;
 uint16_t aut_shf_tim_ofs=2000;
 
+uint16_t calculate_Servo_ticks(double deg);
 
-uint8_t deg_ofs=50;
-double deg_dwn= -65;
-double deg_up = -65;
-double deg_neutral = -45;
-double deg_mid = 65;
+uint8_t deg_ofs=60;
+double deg_dwn= 60;
+double deg_up = 60;
+double deg_neutral = 45;
+double deg_mid = 60;
 uint16_t time_mid;
 uint16_t time_dwn;
 uint16_t time_up;
@@ -407,7 +415,7 @@ void new_clutch_ctrl(){
 	
 	if(butt_clutch_slow | butt_clutch_fast) 
 	{	
-		dgr_clu = 100;
+		dgr_clu = 120;
 		clutch_time = 1800 + (dgr_clu *(2400/deg_max));
 		clu_period = 80*(servo_angleid_rear+1);
 		clu_pressed = 1;
@@ -429,8 +437,33 @@ void new_clutch_ctrl(){
 			clutch_closed = false;
 		}
 	}
+	
 
+	/*
+	if(butt_clutch_slow | butt_clutch_fast){
+		clu_pressed = 1;
+		clutch_angle = CLUTCH_MAX_ANGLE;
+		clutch_time = calculate_Servo_ticks(clutch_angle);
+		clu_period = 500*(servo_angleid_rear);
+		pitch = (double)(CLUTCH_MAX_ANGLE)/(clutch_period/10.0);
+		
+		}else{
+		if(clutch_period > 0){
+			clutch_angle = clutch_angle-pitch;
+			clutch_time = calculate_Servo_ticks(clutch_angle);
+			clu_period -= 10;
+			clu_pressed = 0;
+		}
+	}
+	*/
 }
+
+uint16_t calculate_Servo_ticks(double deg){
+	
+	return (uint16_t) (1800 + (deg * (2400.0 / SERVO_MAXANGLE)));
+	
+}
+
 
 void butt_read() //reading button signals
 {
